@@ -18,11 +18,11 @@ func worker1() {
 	<-ch1
 	fmt.Printf("A")
 	wg.Done()
-	ch2 <- struct{}{}
+	ch3 <- struct{}{}
 }
 
 func worker2() {
-	<-ch2
+	<-ch1
 	fmt.Printf("B")
 	wg.Done()
 	ch3 <- struct{}{}
