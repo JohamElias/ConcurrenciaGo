@@ -7,6 +7,7 @@ import (
 
 var (
 	wg  sync.WaitGroup
+	ch0 chan struct{} = make(chan struct{}, 1)
 	ch1 chan struct{} = make(chan struct{}, 1)
 	ch2 chan struct{} = make(chan struct{}, 1)
 	ch3 chan struct{} = make(chan struct{}, 1)
@@ -15,49 +16,54 @@ var (
 )
 
 func worker1() {
+	<-ch0
 	<-ch1
 	fmt.Printf("A")
-	wg.Done()
 	ch3 <- struct{}{}
+	ch2 <- struct{}{}
+	wg.Done()
 }
 
 func worker2() {
-	<-ch1
+	<-ch0
+	<-ch2
 	fmt.Printf("B")
-	wg.Done()
 	ch3 <- struct{}{}
+	ch1 <- struct{}{}
+	wg.Done()
 }
 
 func worker3() {
 	<-ch3
 	fmt.Printf("C")
-	wg.Done()
 	ch4 <- struct{}{}
+	wg.Done()
 }
 
 func worker4() {
 	<-ch4
 	fmt.Printf("D")
-	wg.Done()
 	ch5 <- struct{}{}
+	wg.Done()
 }
 
 func worker5() {
 	<-ch5
 	fmt.Printf("E")
+	ch0 <- struct{}{}
 	wg.Done()
-	ch1 <- struct{}{}
 }
 
 func main() {
+	ch0 <- struct{}{}
 	ch1 <- struct{}{}
 	for true {
 		wg.Add(5)
-		worker1()
-		worker3()
-		worker4()
-		worker5()
-		worker2()
+		go worker1()
+		go worker3()
+		go worker4()
+		go worker5()
+		go worker2()
 		wg.Wait()
 	}
 

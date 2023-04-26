@@ -53,11 +53,11 @@ func main() {
 	ch1 <- struct{}{}
 	for true {
 		wg.Add(5)
-		worker1()
-		worker2()
-		worker3()
-		worker4()
-		worker5()
+		go worker1()
+		go worker2()
+		go worker3()
+		go worker4()
+		go worker5()
 		wg.Wait()
 	}
 
