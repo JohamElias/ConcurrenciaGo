@@ -22,7 +22,7 @@ func productor(c chan int) {
 		fmt.Printf("productor %d %d %v\n", index, item, buffer)
 		c <- index
 	}
-	//close(c)
+	close(c)
 	wg.Done()
 }
 

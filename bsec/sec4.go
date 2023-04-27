@@ -23,7 +23,12 @@ func worker1() {
 		<-ch1
 		fmt.Printf("A")
 		wg.Done()
-		ch3 <- struct{}{}
+		select {
+		case <-ch0:
+			ch3 <- struct{}{}
+		case <-ch6:
+			ch4 <- struct{}{}
+		}
 	}
 }
 
@@ -33,7 +38,12 @@ func worker2() {
 		<-ch1
 		fmt.Printf("B")
 		wg.Done()
-		ch3 <- struct{}{}
+		select {
+		case <-ch0:
+			ch3 <- struct{}{}
+		case <-ch6:
+			ch4 <- struct{}{}
+		}
 	}
 }
 
@@ -43,7 +53,8 @@ func worker3() {
 		<-ch3
 		fmt.Printf("C")
 		wg.Done()
-		ch4 <- struct{}{}
+		ch5 <- struct{}{}
+		ch6 <- struct{}{}
 	}
 }
 
@@ -54,6 +65,7 @@ func worker4() {
 		fmt.Printf("D")
 		wg.Done()
 		ch5 <- struct{}{}
+		ch4 <- struct{}{}
 	}
 }
 
@@ -75,12 +87,12 @@ func worker5() {
 }
 
 func main() {
-
 	go worker1()
 	go worker2()
 	go worker3()
 	go worker4()
 	go worker5()
 	ch1 <- struct{}{}
+	ch0 <- struct{}{}
 	wg.Wait()
 }

@@ -24,18 +24,16 @@ func worker1() {
 		fmt.Printf("A")
 		wg.Done()
 		ch3 <- struct{}{}
-		ch6 <- struct{}{}
 	}
 }
 
 func worker2() {
 	for {
 		wg.Add(1)
-		<-ch2
+		<-ch1
 		fmt.Printf("B")
 		wg.Done()
 		ch3 <- struct{}{}
-		ch0 <- struct{}{}
 	}
 }
 
@@ -65,12 +63,7 @@ func worker5() {
 		<-ch5
 		fmt.Printf("E")
 		wg.Done()
-		select {
-		case <-ch0:
-			ch1 <- struct{}{}
-		case <-ch6:
-			ch2 <- struct{}{}
-		}
+		ch1 <- struct{}{}
 		/*if mux == true {
 			mux = false
 			ch1 <- struct{}{}
